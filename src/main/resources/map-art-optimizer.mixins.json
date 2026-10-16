@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "package": "dev.mapframes.mixin",
+  "compatibilityLevel": "JAVA_25",
+  "client": [
+    "MapRendererMixin",
+    "MapRenderStateMixin",
+    "XaeroMapTileChunkMixin",
+    "XaeroLeafRegionTextureMixin"
+  ],
+  "injectors": { "defaultRequire": 1 }
+}

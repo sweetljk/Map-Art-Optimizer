@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "id": "map_art_optimizer",
+  "version": "${version}",
+  "name": "Map Art Optimizer",
+  "description": "Displays locally explored Xaero World Map terrain on vanilla framed maps.",
+  "authors": [
+    "sweetljk"
+  ],
+  "contributors": [
+    "sunapril"
+  ],
+  "environment": "client",
+  "entrypoints": { "client": [ "dev.mapframes.MapFramesClient" ] },
+  "mixins": [ "map-art-optimizer.mixins.json" ],
+  "license": "MIT",
+  "icon": "assets/map_art_optimizer/icon.png",
+  "contact": {
+    "sources": "https://github.com/sweetljk/Map-Art-Optimizer"
+  },
+  "depends": {
+    "fabricloader": ">=0.19.3",
+    "minecraft": "26.1.2",
+    "java": ">=25",
+    "fabric-api": "*",
+    "xaeroworldmap": "1.41.3"
+  }
+}

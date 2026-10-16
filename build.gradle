@@ -1,0 +1,56 @@
+buildscript {
+    if (!gradle.startParameter.projectProperties.containsKey('offlineLocal')) {
+        repositories {
+            maven { url = 'https://maven.fabricmc.net/' }
+            mavenCentral()
+        }
+        dependencies { classpath 'net.fabricmc:fabric-loom:1.17.21' }
+    }
+}
+
+def offlineLocal = providers.gradleProperty('offlineLocal').isPresent()
+apply plugin: offlineLocal ? 'java' : 'net.fabricmc.fabric-loom'
+
+version = '0.1.0'
+group = 'dev.mapframes'
+base { archivesName = 'map-art-optimizer' }
+
+repositories { mavenCentral() }
+
+dependencies {
+    if (offlineLocal) {
+        // Minecraft 26.1.2 is unobfuscated. A Java 25 JAR needs no remapping;
+        // build-local.ps1 assembles these exact-version, already-cached dependencies.
+        compileOnly files(file(providers.gradleProperty('localClasspathFile').get()).readLines('UTF-8'))
+    } else {
+        minecraft 'com.mojang:minecraft:26.1.2'
+        implementation 'net.fabricmc:fabric-loader:0.19.3'
+        implementation 'net.fabricmc.fabric-api:fabric-api:0.155.3+26.1.2'
+        compileOnly files(providers.gradleProperty('xaeroJar').orElse('libs/xaeroworldmap-fabric-26.1.2-1.41.3.jar'))
+    }
+}
+
+java {
+    toolchain { languageVersion = JavaLanguageVersion.of(25) }
+    withSourcesJar()
+}
+tasks.withType(JavaCompile).configureEach {
+    options.release = 25
+    options.encoding = 'UTF-8'
+    if (offlineLocal) {
+        options.compilerArgs.add('-proc:none')
+        // Use the installed javac process: this restricted Windows host denies
+        // ZipFS real-path cleanup, after successful compilation, in Gradle's JVM.
+        options.fork = true
+        options.forkOptions.executable = new File(System.getenv('JAVA_HOME'), 'bin/javac.exe').absolutePath
+    }
+}
+processResources {
+    inputs.property 'version', project.version
+    filesMatching('fabric.mod.json') { expand version: project.version }
+}
+tasks.named('wrapper') {
+    gradleVersion = '9.6.0'
+    distributionType = Wrapper.DistributionType.BIN
+}
+tasks.named('jar') { from('LICENSE') }
